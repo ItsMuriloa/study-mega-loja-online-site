@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Havan Clone - Marketplace & Click & Collect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 flex flex-col min-h-screen antialiased">
+
+    <div class="bg-blue-900 text-white text-xs py-2 px-4 shadow-sm">
+        <div class="container mx-auto max-w-7xl flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <span><i class="fa-solid fa-graduation-cap mr-1.5 text-blue-400"></i> Engenharia de Software • Unilasalle</span>
+                <span class="hidden sm:inline text-gray-400">|</span>
+                <span class="hidden sm:inline text-gray-300">Protótipo Avançado de Arquitetura Omnichannel (O2O)</span>
+            </div>
+            <div class="bg-blue-800 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold">
+                Inspirado em Havan, Leroy Merlin & Cassol
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="border-b border-gray-200">
+            <div class="container mx-auto px-4 py-4 flex flex-col lg:flex-row justify-between items-center max-w-7xl gap-4">
+                
+                <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="mudarAba('vitrine')">
+                    <div class="bg-blue-600 text-white p-2.5 rounded-xl font-black tracking-tighter text-xl shadow-md shadow-blue-600/20 flex items-center justify-center">
+                        <i class="fa-solid fa-building-flag mr-1.5"></i> HAVAN <span class="text-xs bg-white text-blue-600 px-1 rounded ml-1.5 font-bold">O2O</span>
+                    </div>
+                </div>
+
+                <div class="w-full lg:flex-1 lg:max-w-xl relative">
+                    <input type="text" id="input-busca" onkeyup="filtrarPorNome()" placeholder="Procure por TVs, ferramentas, eletrodomésticos, decoração..." class="w-full pl-4 pr-12 py-2.5 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-inner">
+                    <button class="absolute right-2 top-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-6 w-full lg:w-auto justify-between lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0">
+                    <div class="flex items-center space-x-2 cursor-pointer hover:text-blue-600 transition-colors group" onclick="abrirModalLoja()">
+                        <div class="bg-gray-100 p-2 rounded-xl group-hover:bg-blue-50 transition-colors">
+                            <i class="fa-solid fa-location-dot text-blue-600 text-lg"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-[9px] text-gray-400 font-extrabold uppercase tracking-wider leading-none">Retirar na Filial:</p>
+                            <p id="nav-loja-nome" class="text-xs font-black text-gray-800 mt-0.5">Canoas Centro</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-100 p-1 rounded-xl flex border border-gray-200 text-xs shadow-inner">
+                        <button id="btn-visao-cliente" onclick="alternarAtor('cliente')" class="bg-white text-gray-900 font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all">
+                            <i class="fa-solid fa-user text-blue-600 mr-1"></i> Cliente
+                        </button>
+                        <button id="btn-visao-balcao" onclick="alternarAtor('balcao')" class="text-gray-500 hover:text-gray-900 font-semibold px-3 py-1.5 rounded-lg transition-all">
+                            <i class="fa-solid fa-desktop mr-1"></i> Balcão
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-blue-600 text-white text-xs font-semibold shadow-inner">
+            <div class="container mx-auto px-4 max-w-7xl flex items-center space-x-1 overflow-x-auto scrollbar-none py-1.5">
+                <button onclick="filtrarCategoria('todos')" id="cat-todos" class="bg-white text-blue-700 px-3 py-1.5 rounded-lg font-bold shadow-sm whitespace-nowrap">
+                    <i class="fa-solid fa-border-all mr-1"></i> Todos os Departamentos
+                </button>
+                <button onclick="filtrarCategoria('eletronicos')" id="cat-eletronicos" class="hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">
+                    <i class="fa-solid fa-tv mr-1"></i> Eletrônicos & Áudio
+                </button>
+                <button onclick="filtrarCategoria('casa')" id="cat-casa" class="hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">
+                    <i class="fa-solid fa-screwdriver-wrench mr-1"></i> Casa & Construção
+                </button>
+                <button onclick="filtrarCategoria('eletrodomesticos')" id="cat-eletrodomesticos" class="hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">
+                    <i class="fa-solid fa-couch mr-1"></i> Eletrodomésticos
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="wrapper-banner" class="container mx-auto px-4 mt-6 max-w-7xl">
+        <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white rounded-2xl p-6 md:p-10 shadow-lg flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden border border-blue-800">
+            <div class="absolute -right-10 -bottom-10 text-white/5 text-[15rem] font-black pointer-events-none">
+                O2O
+            </div>
+            <div class="space-y-3 z-10 text-center md:text-left">
+                <span class="bg-amber-400 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">Semana do Click & Collect</span>
+                <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight max-w-xl leading-tight">Compre no Site e Retire na Loja Física sem pegar Filas!</h2>
+                <p class="text-xs text-blue-100 max-w-md">Vantagem Havan: Isenção total de frete e retirada liberada em até 2 horas na filial escolhida.</p>
+            </div>
+            <div class="bg-white/10 border border-white/20 backdrop-blur-md rounded-xl p-4 text-center min-w-[200px] z-10 shadow-lg">
+                <p class="text-[10px] uppercase font-bold tracking-wider text-amber-300">Frete Promocional</p>
+                <p class="text-3xl font-black my-1">R$ 0,00</p>
+                <p class="text-[9px] text-blue-200">Para retirada no balcão de Canoas ou São Leopoldo</p>
+            </div>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8 flex-grow max-w-7xl">
+
+        <section id="aba-vitrine" class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start transition-all duration-300">
+            
+            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-6">
+                <div>
+                    <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider mb-3"><i class="fa-solid fa-filter text-blue-600 mr-1"></i> Filtrar Preço</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 text-xs font-medium text-gray-700 cursor-pointer">
+                            <input type="radio" name="filtro-preco" value="todos" checked onclick="filtrarPorPreco('todos')" class="text-blue-600">
+                            <span>Todos os Preços</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-xs font-medium text-gray-700 cursor-pointer">
+                            <input type="radio" name="filtro-preco" value="ate500" onclick="filtrarPorPreco('ate500')" class="text-blue-600">
+                            <span>Até R$ 500,00</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-xs font-medium text-gray-700 cursor-pointer">
+                            <input type="radio" name="filtro-preco" value="de500a2000" onclick="filtrarPorPreco('de500a2000')" class="text-blue-600">
+                            <span>R$ 500,00 a R$ 2.000,00</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-xs font-medium text-gray-700 cursor-pointer">
+                            <input type="radio" name="filtro-preco" value="acima2000" onclick="filtrarPorPreco('acima2000')" class="text-blue-600">
+                            <span>Acima de R$ 2.000,00</span>
+                        </label>
+                    </div>
+                </div>
+
+                <hr class="border-gray-200">
+
+                <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-3">
+                    <div class="flex items-start space-x-2.5">
+                        <i class="fa-solid fa-truck-fast text-blue-600 text-sm mt-0.5"></i>
+                        <div>
+                            <p class="text-xs font-bold text-gray-900">Logística Omnichannel</p>
+                            <p class="text-[10px] text-gray-500">Integração real de estoques físicos e digitais para otimizar o atendimento local.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 space-y-4">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <h2 class="text-sm font-black tracking-tight text-gray-900 uppercase" id="titulo-vitrine">Todos os Departamentos</h2>
+                    <span class="text-xs text-gray-400 font-mono" id="contador-produtos">6 produtos listados</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" id="grid-produtos">
+                    </div>
+            </div>
+        </section>
+
+
+        <section id="aba-detalhe" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-start transition-all duration-300">
+            <div class="lg:col-span-12">
+                <button onclick="mudarAba('vitrine')" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 transition-colors">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i> Voltar para a vitrine de departamentos
+                </button>
+            </div>
+
+            <div class="lg:col-span-7 bg-white border border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center shadow-sm relative min-h-[420px]">
+                <div class="absolute top-4 left-4 bg-red-50 text-red-700 text-[10px] font-black px-2.5 py-1 rounded-lg border border-red-100 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-nodes text-red-500"></i> Exclusivo Retirada Expressa
+                </div>
+                <img id="detalhe-imagem" src="" alt="Produto Real" class="max-h-72 object-contain rounded-xl shadow-sm transition-transform hover:scale-102 duration-300">
+            </div>
+
+            <div class="lg:col-span-5 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5">
+                <div>
+                    <span id="detalhe-categoria" class="text-[9px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded">Categoria</span>
+                    <h1 id="detalhe-nome" class="text-xl font-black text-gray-900 mt-2 tracking-tight">Nome Comercial Completo</h1>
+                    <p class="text-[10px] text-gray-400 mt-0.5 font-mono">CÓDIGO INTERNO ERP: REG-2026-O2O</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-xl border border-gray-100">
+                    <div class="flex items-baseline space-x-2">
+                        <span id="detalhe-preco" class="text-3xl font-black text-slate-950">R$ 0,00</span>
+                        <span class="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-lg shadow-sm">Oferta Balcão</span>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-1"><i class="fa-solid fa-credit-card mr-1 text-gray-400"></i> Em até 10x sem juros no cartão ou com desconto extra via Pix.</p>
+                </div>
+
+                <div class="space-y-2 border-t border-b border-gray-100 py-4">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-shop text-blue-600 mr-1"></i> Disponibilidade na Unidade:</label>
+                        <button onclick="abrirModalLoja()" class="text-[11px] text-blue-600 hover:underline font-bold">Trocar Filial</button>
+                    </div>
+                    <div class="bg-blue-50/40 rounded-xl p-3 border border-blue-100 flex items-center space-x-3">
+                        <div class="bg-blue-100 text-blue-700 p-2 rounded-lg text-sm"><i class="fa-solid fa-warehouse"></i></div>
+                        <div>
+                            <p id="txt-status-loja-nome" class="text-xs font-bold text-gray-900">Canoas Centro</p>
+                            <p id="txt-status-loja-info" class="text-[11px] font-medium text-emerald-600">Verificando bases...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2.5">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Como deseja receber seu produto?</label>
+                    
+                    <label onclick="atualizarModalidadeCompra('entrega')" id="card-entrega" class="border border-gray-200 rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 bg-white transition-all block">
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" name="modalidade" value="entrega" id="radio-entrega" class="w-4 h-4 text-blue-600 focus:ring-0">
+                            <div>
+                                <p class="font-bold text-xs text-gray-900"><i class="fa-solid fa-truck text-gray-400 mr-1"></i> Envio Transportadora Tradicional</p>
+                                <p class="text-[10px] text-gray-500">Prazo de entrega interestadual: até 5 dias úteis</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-xs text-gray-700">R$ 29,90</span>
+                    </label>
+
+                    <label onclick="atualizarModalidadeCompra('retirada')" id="card-retirada" class="border-2 border-blue-600 rounded-xl p-3 flex items-center justify-between cursor-pointer bg-blue-50/40 transition-all block">
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" name="modalidade" value="retirada" id="radio-retirada" checked class="w-4 h-4 text-blue-600 focus:ring-0">
+                            <div>
+                                <p class="font-bold text-xs text-gray-900"><i class="fa-solid fa-circle-nodes text-blue-600 mr-1"></i> Retirada Balcão Havan (Click & Collect)</p>
+                                <p class="text-[10px] text-gray-600">Sem taxas de frete. Pronto para retirada com segurança.</p>
+                            </div>
+                        </div>
+                        <span class="font-black text-xs text-green-600 uppercase">Grátis</span>
+                    </label>
+                </div>
+
+                <button onclick="processarCheckoutO2O()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/10 hover:shadow-xl transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-cart-check fa-bag-shopping"></i> Finalizar Compra Presencial
+                </button>
+            </div>
+        </section>
+
+
+        <section id="aba-sucesso" class="hidden max-w-md mx-auto transition-all duration-300">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div class="bg-emerald-600 text-white text-center p-6">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto text-lg mb-2 shadow-inner">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h2 class="text-base font-black uppercase tracking-wide">Reserva Realizada!</h2>
+                    <p class="text-xs text-emerald-100 font-mono mt-0.5" id="txt-sucesso-id">ID: #0000</p>
+                </div>
+
+                <div class="p-6 space-y-6 text-center">
+                    <div>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Esteira de Status Integrada</span>
+                        <div class="flex justify-center">
+                            <span id="badge-status-cliente" class="bg-amber-50 text-amber-800 text-xs font-bold px-3 py-1 rounded-full border border-amber-200 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                <span id="txt-status-cliente">Aguardando Coleta</span>
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 px-2" id="txt-instrucao-cliente">A equipe interna de expedição da loja física recebeu a sua ordem de separação comercial.</p>
+                    </div>
+
+                    <hr class="border-gray-100">
+
+                    <div id="wrapper-qrcode" class="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-5 flex flex-col items-center justify-center space-y-3 opacity-50 transition-opacity">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Apresente este código no Balcão</span>
+                        
+                        <div class="w-28 h-28 bg-white border border-gray-200 p-2 relative flex items-center justify-center rounded-xl shadow-inner">
+                            <i class="fa-solid fa-qrcode text-6xl text-slate-800"></i>
+                            <div id="overlay-qr" class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-2 text-center text-white rounded-xl">
+                                <i class="fa-solid fa-lock text-xs text-yellow-400 mb-1"></i>
+                                <p class="text-[9px] leading-tight text-slate-300">Bloqueado até a separação física do estoque.</p>
+                            </div>
+                        </div>
+
+                        <div id="txt-token-numerico" class="text-xs font-mono bg-white px-3 py-1 rounded-lg border border-gray-200 text-gray-400 font-bold tracking-widest shadow-sm">
+                            XXXX-XXXX
+                        </div>
+                    </div>
+
+                    <button onclick="mudarAba('vitrine')" class="text-xs text-blue-600 hover:text-blue-800 font-black underline block mx-auto transition-colors"><i class="fa-solid fa-chevron-left text-[9px] mr-1"></i> Voltar à Loja</button>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="aba-balcao" class="hidden transition-all duration-300">
+            <div class="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800 shadow-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-800 gap-2">
+                    <div>
+                        <h2 class="text-sm font-black text-amber-400 flex items-center gap-2 uppercase tracking-wider">
+                            <i class="fa-solid fa-desktop"></i> Sistema de Retirada - Terminal de Balcão (O2O)
+                        </h2>
+                        <p class="text-xs text-slate-400">Gerenciador de alteração de estados da ordem física de e-commerce.</p>
+                    </div>
+                    <div class="text-xs bg-slate-800 px-3 py-1.5 rounded-lg text-slate-300 border border-slate-700">
+                        Unidade: <span id="txt-operador-loja" class="font-bold text-white">-</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Ordem Corrente na Fila</span>
+                        
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between items-center">
+                                <span id="txt-operador-id" class="text-xs font-mono font-bold text-white">#0000</span>
+                                <span id="badge-operador-status" class="bg-gray-800 text-gray-400 text-[9px] font-bold px-2 py-0.5 rounded border border-gray-700 uppercase">Vazio</span>
+                            </div>
+                            <p id="txt-operador-produto" class="text-xs text-slate-300 font-bold mt-3">Aguardando fechamento...</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-4 lg:col-span-2">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Gatilhos de Mudança de Estado</span>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="mudarStatusOperador('pronto')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3.5 rounded-xl text-xs flex items-center justify-between transition-all shadow-md shadow-blue-600/10">
+                                <span><i class="fa-solid fa-boxes-packing mr-2"></i> 1. Confirmar Triagem (Pronto)</span>
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </button>
+                            <button onclick="mudarStatusOperador('entregue')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-3.5 rounded-xl text-xs flex items-center justify-between transition-all shadow-md shadow-emerald-600/10">
+                                <span><i class="fa-solid fa-handshake mr-2"></i> 2. Registrar Entrega do Item</span>
+                                <i class="fa-solid fa-circle-check"></i>
+                            </button>
+                        </div>
+
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div class="space-y-0.5">
+                                <p class="text-xs font-bold text-red-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation"></i> Proteção contra Abandono de Pedidos</p>
+                                <p class="text-[11px] text-slate-400 max-w-md leading-relaxed">Simula a regra de negócio do sistema: Se o cliente não comparecer em 7 dias, o pedido expira, o item retorna à prateleira e o estorno é emitido.</p>
+                            </div>
+                            <button onclick="mudarStatusOperador('cancelado')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs px-3 py-2 rounded-lg border border-red-500/20 font-bold transition-colors whitespace-nowrap">Gatilhar Cancelamento</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="modal-loja" class="fixed inset-0 bg-slate-950/60 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-all duration-300">
+        <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl transform scale-95 transition-all duration-300" id="modal-content">
+            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-xs uppercase tracking-wider"><i class="fa-solid fa-map-location-dot text-blue-500 mr-2"></i> Unidades Próximas</h3>
+                <button onclick="fecharModalLoja()" class="text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase block mb-1">Escolha a Região</label>
+                    <select id="seletor-cidade" onchange="renderizarLojasModal()" class="w-full border border-gray-200 rounded-xl p-2.5 text-xs bg-gray-50 focus:outline-none focus:border-blue-500 transition-colors">
+                        <option value="canoas">Canoas (RS)</option>
+                        <option value="sao-leopoldo">São Leopoldo (RS)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2 max-h-[200px] overflow-y-auto pr-1" id="box-lista-lojas">
+                    </div>
+            </div>
+
+            <div class="bg-gray-50 px-5 py-3 border-t border-gray-100 flex justify-end space-x-2">
+                <button onclick="fecharModalLoja()" class="px-3 py-1.5 text-xs text-gray-500 font-medium hover:text-gray-700">Cancelar</button>
+                <button onclick="salvarEscolhaLoja()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 translate-y-24 opacity-0 transition-all duration-300 z-50 max-w-xs pointer-events-none">
+        <div class="p-1 rounded bg-blue-600 text-white text-xs flex items-center justify-center w-6 h-6" id="toast-icon-bg">
+            <i class="fa-solid fa-bell" id="toast-icon"></i>
+        </div>
+        <div>
+            <p class="font-bold text-xs" id="toast-title">Notificação</p>
+            <p class="text-[11px] text-gray-400 mt-0.5" id="toast-msg">Mensagem logístico.</p>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 text-center py-6 text-xs text-gray-400 mt-12 shadow-inner">
+        <div class="container mx-auto px-4">
+            <p class="font-bold text-gray-700">Havan Marketplace S.A. — Protótipo Integrado O2O</p>
+            <p class="mt-0.5 text-[11px]">Desenvolvido para fins de validação de requisitos e Engenharia de Software.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Banco de Dados Massivo com Imagens Reais do Unsplash para evitar links quebrados
+        const dbProdutos = [
+            { id: 201, nome: 'Smart TV 4K Crystal UHD 55" Wi-Fi Bluetooth HDR', categoria: 'eletronicos', preco: 2549.00, img: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=500&q=80', estoques: { 1: 5, 2: 0, 3: 4 } },
+            { id: 202, nome: 'Smartphone Android 5G Pro 256GB Câmera Tripla', categoria: 'eletronicos', preco: 1799.00, img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80', estoques: { 1: 12, 2: 8, 3: 0 } },
+            { id: 203, nome: 'Furadeira de Impacto Profissional Mandril 1/2 Reversível', categoria: 'casa', preco: 389.90, img: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&q=80', estoques: { 1: 25, 2: 14, 3: 35 } },
+            { id: 204, nome: 'Maleta de Ferramentas Completa Aço Cromo 142 Peças', categoria: 'casa', preco: 249.00, img: 'https://images.unsplash.com/photo-1530124566582-a618bc2615fd?w=500&q=80', estoques: { 1: 0, 2: 6, 3: 15 } },
+            { id: 205, nome: 'Geladeira Frost Free Duplex 410L Inox Digital', categoria: 'eletrodomesticos', preco: 3899.00, img: 'https://images.unsplash.com/photo-1571175432244-5f025856e47b?w=500&q=80', estoques: { 1: 3, 2: 0, 3: 2 } },
+            { id: 206, nome: 'Sofá Retrátil e Reclinável 3 Lugares Tecido Suede', categoria: 'eletrodomesticos', preco: 1450.00, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80', estoques: { 1: 4, 2: 3, 3: 0 } }
+        ];
+
+        const dbLojas = {
+            'canoas': [
+                { id: 1, nome: 'Havan Canoas Centro', endereco: 'Av. Guilherme Schell, 5000' },
+                { id: 2, nome: 'Havan Canoas Shopping', endereco: 'Av. dos Estados, 450' }
+            ],
+            'sao-leopoldo': [
+                { id: 3, nome: 'Havan São Leopoldo Bourbon', endereco: 'Av. Primeiro de Março, 900' }
+            ]
+        };
+
+        let lojaAtiva = dbLojas['canoas'][0];
+        let lojaTemp = lojaAtiva;
+        let produtoSelecionado = null;
+        let modalidadeEnvio = 'retirada';
+        let filtroPrecoAtivo = 'todos';
+        let categoriaAtiva = 'todos';
+        
+        let pedidoAtivo = { id: "", status: "criacao", produto: null, loja: null };
+
+        window.onload = () => {
+            executarFiltrosCombinados();
+            renderizarLojasModal();
+            atualizarLayoutFocoLoja();
+        };
+
+        // Renderizador Robusto da Vitrine de Produtos (Havan Grid)
+        function renderizarVitrine(lista) {
+            const grid = document.getElementById('grid-produtos');
+            grid.innerHTML = '';
+            document.getElementById('contador-produtos').innerText = `${lista.length} produtos listados`;
+
+            if (lista.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-16 bg-white rounded-2xl border border-gray-200 text-gray-400 font-medium text-xs">
+                        <i class="fa-solid fa-box-open text-4xl block mb-2 text-gray-300"></i> Nenhum item disponível nesta combinação de filtros.
+                    </div>`;
+                return;
+            }
+
+            lista.forEach(p => {
+                const qtdEstoque = p.estoques[lojaAtiva.id] || 0;
+                const card = document.createElement('div');
+                card.className = "bg-white border border-gray-200 rounded-2xl p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-300 group relative";
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="w-full h-44 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden border border-gray-100 mb-4 shadow-inner relative">
+                            <img src="${p.img}" alt="${p.nome}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
+                        </div>
+
+                        <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded">${p.categoria}</span>
+                        <h3 class="font-bold text-xs text-gray-800 mt-2 line-clamp-2 min-h-[32px] group-hover:text-blue-600 transition-colors">${p.nome}</h3>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-gray-100 space-y-3">
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-base font-black text-slate-950">R$ ${p.preco.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                            <span class="text-[9px] font-black ${qtdEstoque > 0 ? 'text-emerald-700 bg-emerald-50' : 'text-amber-700 bg-amber-50'} px-2 py-0.5 rounded">
+                                <i class="fa-solid ${qtdEstoque > 0 ? 'fa-circle-check' : 'fa-clock'} mr-0.5"></i> ${qtdEstoque > 0 ? 'Estoque OK' : '2 dias'}
+                            </span>
+                        </div>
+                        <button onclick="carregarDetalhesProduto(${p.id})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-1">
+                            Comprar / Retirar <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function carregarDetalhesProduto(id) {
+            produtoSelecionado = dbProdutos.find(p => p.id === id);
+            
+            document.getElementById('detalhe-categoria').innerText = produtoSelecionado.categoria;
+            document.getElementById('detalhe-nome').innerText = produtoSelecionado.nome;
+            document.getElementById('detalhe-preco').innerText = `R$ ${produtoSelecionado.preco.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            // Injeta a foto correspondente real
+            document.getElementById('detalhe-imagem').src = produtoSelecionado.img;
+            document.getElementById('detalhe-imagem').alt = produtoSelecionado.nome;
+
+            atualizarLayoutFocoLoja();
+            atualizarModalidadeCompra('retirada');
+            mudarAba('detalhe');
+        }
+
+        // Sistema Combinado de Filtragem e Busca em Tempo Real
+        function filtrarCategoria(cat) {
+            categoriaAtiva = cat;
+            
+            // Gerencia classes visuais dos botões do menu
+            ['todos', 'eletronicos', 'casa', 'eletrodomesticos'].forEach(c => {
+                const btn = document.getElementById(`cat-${c}`);
+                if (c === cat) {
+                    btn.className = "bg-white text-blue-700 px-3 py-1.5 rounded-lg font-bold shadow-sm whitespace-nowrap";
+                } else {
+                    btn.className = "hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap";
+                }
+            });
+
+            document.getElementById('titulo-vitrine').innerText = cat === 'todos' ? "Todos os Departamentos" : `Departamento: ${cat}`;
+            executarFiltrosCombinados();
+        }
+
+        function filtrarPorPreco(range) {
+            filtroPrecoAtivo = range;
+            executarFiltrosCombinados();
+        }
+
+        function filtrarPorNome() {
+            executarFiltrosCombinados();
+        }
+
+        function executarFiltrosCombinados() {
+            let resultado = dbProdutos;
+
+            // 1. Filtro por Categoria
+            if (categoriaAtiva !== 'todos') {
+                resultado = resultado.filter(p => p.categoria === categoriaAtiva);
+            }
+
+            // 2. Filtro por Range de Preço
+            if (filtroPrecoAtivo === 'ate500') {
+                resultado = resultado.filter(p => p.preco <= 500);
+            } else if (filtroPrecoAtivo === 'de500a2000') {
+                resultado = resultado.filter(p => p.preco > 500 && p.preco <= 2000);
+            } else if (filtroPrecoAtivo === 'acima2000') {
+                resultado = resultado.filter(p => p.preco > 2000);
+            }
+
+            // 3. Filtro de Input de Texto
+            const buscaQuery = document.getElementById('input-busca').value.toLowerCase();
+            if (buscaQuery) {
+                resultado = resultado.filter(p => p.nome.toLowerCase().includes(buscaQuery));
+            }
+
+            renderizarVitrine(resultado);
+        }
+
+        // Sistema de Controle de Telas e Atores (Heurísticas de Interface)
+        function alternarAtor(ator) {
+            const btnC = document.getElementById('btn-visao-cliente');
+            const btnB = document.getElementById('btn-visao-balcao');
+
+            if (ator === 'cliente') {
+                btnC.className = "bg-white text-gray-900 font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all";
+                btnB.className = "text-gray-500 hover:text-gray-900 font-semibold px-3 py-1.5 rounded-lg transition-all";
+                document.getElementById('wrapper-banner').classList.remove('hidden');
+                mudarAba(pedidoAtivo.status === 'criacao' ? 'vitrine' : 'sucesso');
+            } else {
+                btnB.className = "bg-white text-gray-900 font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all";
+                btnC.className = "text-gray-500 hover:text-gray-900 font-semibold px-3 py-1.5 rounded-lg transition-all";
+                document.getElementById('wrapper-banner').classList.add('hidden');
+                mudarAba('balcao');
+            }
+        }
+
+        function mudarAba(destino) {
+            document.getElementById('aba-vitrine').classList.add('hidden');
+            document.getElementById('aba-detalhe').classList.add('hidden');
+            document.getElementById('aba-sucesso').classList.add('hidden');
+            document.getElementById('aba-balcao').classList.add('hidden');
+
+            if (destino === 'vitrine') document.getElementById('aba-vitrine').classList.remove('hidden');
+            if (destino === 'detalhe') document.getElementById('aba-detalhe').classList.remove('hidden');
+            if (destino === 'sucesso') document.getElementById('aba-sucesso').classList.remove('hidden');
+            if (destino === 'balcao') document.getElementById('aba-balcao').classList.remove('hidden');
+        }
+
+        // Modal Controle de Filiais e Estoques
+        function abrirModalLoja() {
+            const m = document.getElementById('modal-loja');
+            const c = document.getElementById('modal-content');
+            m.classList.remove('hidden');
+            setTimeout(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); }, 15);
+        }
+
+        function fecharModalLoja() {
+            const m = document.getElementById('modal-loja');
+            const c = document.getElementById('modal-content');
+            m.classList.add('opacity-0'); c.classList.add('scale-95');
+            setTimeout(() => m.classList.add('hidden'), 250);
+        }
+
+        function renderizarLojasModal() {
+            const cid = document.getElementById('seletor-cidade').value;
+            const box = document.getElementById('box-lista-lojas');
+            box.innerHTML = '';
+
+            dbLojas[cid].forEach(l => {
+                const isChecked = l.id === lojaTemp.id;
+                const div = document.createElement('div');
+                div.className = `border p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all ${isChecked ? 'border-blue-600 bg-blue-50/50' : 'border-gray-200 hover:bg-gray-50'}`;
+                div.onclick = () => { lojaTemp = l; renderizarLojasModal(); };
+
+                div.innerHTML = `
+                    <div>
+                        <p class="text-xs font-bold text-gray-900">${l.nome}</p>
+                        <p class="text-[10px] text-gray-500">${l.endereco}</p>
+                    </div>
+                    <div class="w-4 h-4 rounded-full border flex items-center justify-center ${isChecked ? 'border-blue-600' : 'border-gray-300'}">
+                        <div class="w-2 h-2 rounded-full ${isChecked ? 'bg-blue-600' : 'bg-transparent'}"></div>
+                    </div>
+                `;
+                box.appendChild(div);
+            });
+        }
+
+        function salvarEscolhaLoja() {
+            lojaAtiva = lojaTemp;
+            fecharModalLoja();
+            atualizarLayoutFocoLoja();
+            executarFiltrosCombinados();
+            triggerToast("Alinhamento O2O", `Loja ativa alterada para: ${lojaAtiva.nome}`, "success");
+        }
+
+        function atualizarLayoutFocoLoja() {
+            document.getElementById('nav-loja-nome').innerText = lojaAtiva.nome.replace('Havan ', '');
+            document.getElementById('txt-operador-loja').innerText = lojaAtiva.nome;
+            document.getElementById('txt-status-loja-nome').innerText = lojaAtiva.nome;
+
+            if (!produtoSelecionado) return;
+
+            const estoqueFisico = produtoSelecionado.estoques[lojaAtiva.id] || 0;
+            const statusInfo = document.getElementById('txt-status-loja-info');
+
+            if (estoqueFisico > 0) {
+                statusInfo.className = "text-[11px] font-semibold text-emerald-600";
+                statusInfo.innerHTML = `<i class="fa-solid fa-circle-check"></i> Estoque Confirmado Local (${estoqueFisico} un.) - Retira em 2h`;
+            } else {
+                statusInfo.className = "text-[11px] font-semibold text-amber-600";
+                statusInfo.innerHTML = `<i class="fa-solid fa-truck-ramp-box"></i> Indisponível Local - Remessa CD leva até 2 dias úteis`;
+            }
+        }
+
+        function atualizarModalidadeCompra(m) {
+            modalidadeEnvio = m;
+            const cE = document.getElementById('card-entrega');
+            const cR = document.getElementById('card-retirada');
+
+            if (m === 'entrega') {
+                cE.className = "border-2 border-blue-600 rounded-xl p-3 flex items-center justify-between cursor-pointer bg-blue-50/40 block";
+                cR.className = "border border-gray-200 rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 bg-white block";
+                document.getElementById('radio-entrega').checked = true;
+            } else {
+                cR.className = "border-2 border-blue-600 rounded-xl p-3 flex items-center justify-between cursor-pointer bg-blue-50/40 block";
+                cE.className = "border border-gray-200 rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 bg-white block";
+                document.getElementById('radio-retirada').checked = true;
+            }
+        }
+
+        // Execução do Checkout Comercial
+        function processarCheckoutO2O() {
+            if (modalidadeEnvio === 'entrega') {
+                triggerToast("Restrição Acadêmica", "Escolha a modalidade de Retirada Balcão (Click & Collect) para testar o sistema.", "warning");
+                return;
+            }
+
+            pedidoAtivo.id = `#HV-26${Math.floor(1000 + Math.random() * 9000)}`;
+            pedidoAtivo.status = "aguardando";
+            pedidoAtivo.produto = produtoSelecionado;
+            pedidoAtivo.loja = lojaAtiva;
+
+            document.getElementById('txt-sucesso-id').innerText = `ID DA COMPRA: ${pedidoAtivo.id}`;
+            document.getElementById('txt-operador-id').innerText = pedidoAtivo.id;
+            document.getElementById('txt-operador-produto').innerText = `1x ${pedidoAtivo.produto.nome}`;
+
+            configurarLayoutEstadosCliente("Aguardando Coleta", "A ordem de separação física foi disparada para o balcão interno da filial.", "amber");
+
+            document.getElementById('badge-operador-status').className = "bg-amber-500/20 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded border border-amber-500/30 uppercase";
+            document.getElementById('badge-operador-status').innerText = "Aguardando";
+
+            mudarAba('sucesso');
+            triggerToast("Transação Criada", "Notificação de separação enviada ao balcão presencial.", "success");
+        }
+
+        function configurarLayoutEstadosCliente(titulo, desc, cor) {
+            const badge = document.getElementById('badge-status-cliente');
+            document.getElementById('txt-status-cliente').innerText = titulo;
+            document.getElementById('txt-instrucao-cliente').innerText = desc;
+
+            const wrap = document.getElementById('wrapper-qrcode');
+            const overlay = document.getElementById('overlay-qr');
+            const token = document.getElementById('txt-token-numerico');
+
+            if (cor === 'amber') {
+                badge.className = "bg-amber-50 text-amber-800 text-xs font-bold px-3 py-1 rounded-full border border-amber-200 flex items-center gap-1.5";
+                wrap.classList.add('opacity-50');
+                overlay.classList.remove('hidden');
+                token.innerText = "XXXX-XXXX";
+                token.className = "text-xs font-mono bg-white px-3 py-1 rounded-lg border border-gray-200 text-gray-400 font-bold tracking-widest";
+            } else if (cor === 'emerald') {
+                badge.className = "bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5";
+                wrap.classList.remove('opacity-50');
+                overlay.classList.add('hidden');
+                token.innerText = "HV-O2O-2026";
+                token.className = "text-xs font-mono bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200 text-emerald-700 font-bold tracking-widest shadow-sm";
+            } else {
+                badge.className = "bg-rose-50 text-rose-800 text-xs font-bold px-3 py-1 rounded-full border border-rose-200 flex items-center gap-1.5";
+                wrap.classList.add('opacity-50');
+                overlay.classList.remove('hidden');
+                token.innerText = "CANCELADO";
+                token.className = "text-xs font-mono bg-white px-3 py-1 rounded-lg border border-gray-200 text-gray-400 font-bold tracking-widest";
+            }
+        }
+
+        // Operador Backoffice
+        function mudarStatusOperador(statusAlvo) {
+            if (pedidoAtivo.status === 'criacao') {
+                triggerToast("Erro de Operação", "Não há pedidos ativos na esteira.", "warning");
+                return;
+            }
+
+            const badgeOp = document.getElementById('badge-operador-status');
+
+            if (statusAlvo === 'pronto') {
+                pedidoAtivo.status = "pronto";
+                badgeOp.className = "bg-blue-500/20 text-blue-400 text-[9px] font-bold px-2 py-0.5 rounded border border-blue-500/30 uppercase";
+                badgeOp.innerText = "Pronto";
+                configurarLayoutEstadosCliente("Pronto para Retirada", "Separação física concluída! Seu QR Code foi liberado. Vá ao balcão O2O.", "emerald");
+                triggerToast("Esteira Atualizada", "Voucher digital ativo liberado para o cliente.", "success");
+            } 
+            else if (statusAlvo === 'entregue') {
+                pedidoAtivo.status = "entregue";
+                badgeOp.className = "bg-emerald-500/20 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded border border-emerald-500/30 uppercase";
+                badgeOp.innerText = "Entregue";
+                configurarLayoutEstadosCliente("Pedido Retirado", "Entrega validada com sucesso presencialmente. Baixa sistêmica efetuada.", "emerald");
+                triggerToast("Fluxo Encerrado", "Status atualizado para entregue no banco de dados.", "success");
+            }
+            else if (statusAlvo === 'cancelado') {
+                pedidoAtivo.status = "cancelado";
+                badgeOp.className = "bg-red-500/20 text-red-400 text-[9px] font-bold px-2 py-0.5 rounded border border-red-500/30 uppercase";
+                badgeOp.innerText = "Expirado";
+                configurarLayoutEstadosCliente("Expirado por não-comparecimento", "Prazo limite de 7 dias atingido. O estoque foi devolvido e a compra desfeita.", "rose");
+                triggerToast("Regra Abandono", "Cancelamento e liberação de estoque acionados.", "warning");
+            }
+        }
+
+        function triggerToast(title, text, type) {
+            const toast = document.getElementById('toast');
+            const bg = document.getElementById('toast-icon-bg');
+            const ic = document.getElementById('toast-icon');
+
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = text;
+
+            if (type === 'success') {
+                bg.className = "p-1 rounded bg-emerald-500 text-white text-xs flex items-center justify-center w-6 h-6";
+                ic.className = "fa-solid fa-circle-check";
+            } else {
+                bg.className = "p-1 rounded bg-amber-500 text-slate-900 text-xs flex items-center justify-center w-6 h-6";
+                ic.className = "fa-solid fa-triangle-exclamation";
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
+        }
+    </script>
+</body>
+</html>
