@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho de Compras • Havan Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 min-h-screen antialiased">
+
+    <!-- HEADER - IDÊNTICO AO SEU SITE -->
+    <div class="bg-blue-900 text-white text-xs py-2 px-4 shadow-sm">
+        <div class="container mx-auto max-w-7xl flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <span><i class="fa-solid fa-graduation-cap mr-1.5 text-blue-400"></i> Engenharia de Software • Unilasalle</span>
+                <span class="hidden sm:inline text-gray-400">|</span>
+                <span class="hidden sm:inline text-gray-300">Protótipo Avançado de Arquitetura Omnichannel (O2O)</span>
+            </div>
+            <div class="bg-blue-800 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold">
+                utilize o cupom: GASTAO15
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="border-b border-gray-200">
+            <div class="container mx-auto px-4 py-4 flex flex-col lg:flex-row justify-between items-center max-w-7xl gap-4">
+                
+                <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="window.location.href='index.html'">
+                    <div class="bg-blue-600 text-white p-2.5 rounded-xl font-black tracking-tighter text-xl shadow-md shadow-blue-600/20 flex items-center justify-center">
+                        <i class="fa-solid fa-building-flag mr-1.5"></i>  <span class="text-xs bg-white text-blue-600 px-1 rounded ml-1.5 font-bold">O2O</span>
+                    </div>
+                </div>
+
+                <div class="w-full lg:flex-1 lg:max-w-xl relative">
+                    <input type="text" placeholder="Procure por TVs, ferramentas, eletrodomésticos, decoração..." class="w-full pl-4 pr-12 py-2.5 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-inner">
+                    <button class="absolute right-2 top-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-6 w-full lg:w-auto justify-between lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0">
+                    <a href="index.html" class="flex items-center space-x-2 hover:text-blue-600 transition-colors group">
+                        <div class="bg-gray-100 p-2 rounded-xl group-hover:bg-blue-50 transition-colors">
+                            <i class="fa-solid fa-store text-blue-600 text-lg"></i>
+                        </div>
+                        <span class="text-xs font-black text-gray-800">Vitrine</span>
+                    </a>
+
+                    <a href="login.html" class="flex items-center space-x-2 hover:text-blue-600 transition-colors group">
+                        <div class="bg-gray-100 p-2 rounded-xl group-hover:bg-blue-50 transition-colors">
+                            <i class="fa-solid fa-user text-gray-600 text-lg"></i>
+                        </div>
+                        <span class="text-xs font-black text-gray-800">Entrar</span>
+                    </a>
+
+                    <a href="carrinho.html" class="flex items-center space-x-2 text-blue-600 transition-colors group">
+                        <div class="bg-blue-50 p-2 rounded-xl group-hover:bg-blue-100 transition-colors">
+                            <i class="fa-solid fa-cart-shopping text-blue-600 text-lg"></i>
+                        </div>
+                        <span class="text-xs font-black text-blue-600">Carrinho</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL - CARRINHO -->
+    <main class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-black text-gray-900 tracking-tight">
+                <i class="fa-solid fa-cart-shopping text-blue-600 mr-3"></i>Meu Carrinho
+            </h1>
+            <span class="text-sm text-gray-500 font-bold" id="contador-itens">3 itens</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Lista de Produtos -->
+            <div class="lg:col-span-2 space-y-4">
+                
+                <!-- Produto 1 -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 flex gap-5 items-center hover:shadow-lg transition-all">
+                    <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=150&q=80" alt="Smart TV" class="w-24 h-24 object-contain rounded-xl bg-gray-50 border border-gray-100">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-sm text-gray-900 mb-1">Smart TV 4K Crystal UHD 55"</h3>
+                        <p class="text-xs text-gray-400 font-mono mb-3">CÓD: REG-2026-O2O</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="alterarQuantidade(this, -1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-lg font-bold text-sm transition-colors">−</button>
+                                <span class="font-black text-sm w-8 text-center">1</span>
+                                <button onclick="alterarQuantidade(this, 1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-lg font-bold text-sm transition-colors">+</button>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-black text-lg text-gray-900">R$ 2.549,00</p>
+                                <p class="text-[10px] text-gray-400">Unidade: R$ 2.549,00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="removerItem(this)" class="text-gray-300 hover:text-red-500 transition-colors p-2">
+                        <i class="fa-solid fa-trash-can text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Produto 2 -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 flex gap-5 items-center hover:shadow-lg transition-all">
+                    <img src="https://images.unsplash.com/photo-1504148455328-c376907d081c?w=150&q=80" alt="Furadeira" class="w-24 h-24 object-contain rounded-xl bg-gray-50 border border-gray-100">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-sm text-gray-900 mb-1">Furadeira de Impacto Profissional</h3>
+                        <p class="text-xs text-gray-400 font-mono mb-3">CÓD: REG-2026-O2O</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="alterarQuantidade(this, -1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-lg font-bold text-sm transition-colors">−</button>
+                                <span class="font-black text-sm w-8 text-center">2</span>
+                                <button onclick="alterarQuantidade(this, 1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-lg font-bold text-sm transition-colors">+</button>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-black text-lg text-gray-900">R$ 389,90</p>
+                                <p class="text-[10px] text-gray-400">Unidade: R$ 389,90</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="removerItem(this)" class="text-gray-300 hover:text-red-500 transition-colors p-2">
+                        <i class="fa-solid fa-trash-can text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Produto 3 -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 flex gap-5 items-center hover:shadow-lg transition-all">
+                    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&q=80" alt="Sofá" class="w-24 h-24 object-contain rounded-xl bg-gray-50 border border-gray-100">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-sm text-gray-900 mb-1">Sofá Retrátil Tecido Suede</h3>
+                        <p class="text-xs text-gray-400 font-mono mb-3">CÓD: REG-2026-O2O</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="alterarQuantidade(this, -1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-lg font-bold text-sm transition-colors">−</button>
+                                <span class="font-black text-sm w-8 text-center">1</span>
+                                <button onclick="alterarQuantidade(this, 1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-lg font-bold text-sm transition-colors">+</button>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-black text-lg text-gray-900">R$ 1.450,00</p>
+                                <p class="text-[10px] text-gray-400">Unidade: R$ 1.450,00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="removerItem(this)" class="text-gray-300 hover:text-red-500 transition-colors p-2">
+                        <i class="fa-solid fa-trash-can text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resumo do Pedido -->
+            <div class="lg:col-span-1">
+                <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm sticky top-28 space-y-5">
+                    <h2 class="font-black text-sm text-gray-900 uppercase tracking-wider">
+                        <i class="fa-solid fa-receipt text-blue-600 mr-2"></i>Resumo do Pedido
+                    </h2>
+
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Subtotal (3 itens)</span>
+                            <span class="font-bold text-gray-900">R$ 4.778,80</span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Frete</span>
+                            <span class="font-bold text-emerald-600">Grátis</span>
+                        </div>
+
+                        <div class="border-t border-dashed border-gray-200 pt-3">
+                            <div class="relative">
+                                <label class="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Cupom de desconto</label>
+                                <input type="text" placeholder="GASTAO15" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-blue-600 transition-all pr-20">
+                                <button class="absolute right-1.5 top-7 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors">
+                                    Aplicar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-xl border border-gray-100">
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-xs font-black text-gray-400 uppercase">Valor Total</span>
+                            <span class="text-2xl font-black text-slate-950">R$ 4.778,80</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1">Em até 10x sem juros no cartão</p>
+                    </div>
+
+                    <button onclick="finalizarCompra()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/10 hover:shadow-xl transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-cart-check"></i> Finalizar Compra
+                    </button>
+
+                    <a href="index.html" class="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                        <i class="fa-solid fa-chevron-left text-[10px] mr-1"></i> Continuar Comprando
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 text-center py-6 text-xs text-gray-400 mt-12 shadow-inner">
+        <div class="container mx-auto px-4">
+            <p class="font-bold text-gray-700">Havan Marketplace S.A. — Protótipo Integrado O2O</p>
+            <p class="mt-0.5 text-[11px]">Desenvolvido para fins de validação de requisitos e Engenharia de Software.</p>
+        </div>
+    </footer>
+
+    <script>
+        function alterarQuantidade(btn, delta) {
+            const span = btn.parentElement.querySelector('span');
+            let qtd = parseInt(span.textContent) + delta;
+            if (qtd < 1) qtd = 1;
+            if (qtd > 10) qtd = 10;
+            span.textContent = qtd;
+            alert(`Quantidade alterada para ${qtd}`);
+        }
+
+        function removerItem(btn) {
+            if (confirm('Remover este item do carrinho?')) {
+                const item = btn.closest('.bg-white');
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(20px)';
+                item.style.transition = 'all 0.3s ease';
+                setTimeout(() => item.remove(), 300);
+            }
+        }
+
+        function finalizarCompra() {
+            alert('✅ Pedido finalizado com sucesso! (Simulação O2O)');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
