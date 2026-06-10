@@ -1,2 +1,4 @@
 #Documentos Privados
 docs/
+backend/*.db
+backend/__pycache__/
