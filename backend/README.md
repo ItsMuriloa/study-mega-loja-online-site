@@ -43,6 +43,14 @@ http://127.0.0.1:5000
 
 Ao abrir esse endereco no navegador, a API mostra uma lista das rotas disponiveis.
 
+## Como abrir o frontend integrado
+
+1. Deixe o backend rodando com `python backend/app.py`.
+2. Abra o arquivo `front.html` no navegador.
+3. Na tela, escolha um produto, selecione a loja e finalize a retirada.
+4. O pedido sera salvo no SQLite pelo endpoint `POST /api/orders`.
+5. No terminal de balcao da propria tela, atualize o status para simular preparacao e retirada.
+
 ## Modelo de dados
 
 O banco possui as tabelas principais:

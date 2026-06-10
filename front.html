@@ -400,8 +400,18 @@
     </footer>
 
     <script>
-        // Banco de Dados Massivo com Imagens Reais do Unsplash para evitar links quebrados
-        const dbProdutos = [
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+        const imagensProdutos = {
+            201: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=500&q=80',
+            202: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80',
+            203: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&q=80',
+            204: 'https://ferramentasdeaaz.com.br/3837-large_default/maleta-de-ferramentas-com-142-pecas-multifuncional-em-aco-cromo-vanadio-rttool.jpg',
+            205: 'https://i.zst.com.br/thumbs/12/3e/32/-1048711981.jpg',
+            206: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80'
+        };
+
+        // Fallback visual caso a API nao esteja rodando.
+        let dbProdutos = [
     { id: 201, nome: 'Smart TV 4K Crystal UHD 55" Wi-Fi Bluetooth HDR', categoria: 'eletronicos', preco: 2549.00, img: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=500&q=80', estoques: { 1: 5, 2: 0, 3: 4 } },
     { id: 202, nome: 'Smartphone Android 5G Pro 256GB Câmera Tripla', categoria: 'eletronicos', preco: 1799.00, img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80', estoques: { 1: 12, 2: 8, 3: 0 } },
     { id: 203, nome: 'Furadeira de Impacto Profissional Mandril 1/2 Reversível', categoria: 'casa', preco: 389.90, img: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&q=80', estoques: { 1: 25, 2: 14, 3: 35 } },
@@ -410,7 +420,7 @@
     { id: 206, nome: 'Sofá Retrátil  Tecido Suede', categoria: 'eletrodomesticos', preco: 1450.00, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80', estoques: { 1: 4, 2: 3, 3: 0 } }
 ];
 
-        const dbLojas = {
+        let dbLojas = {
             'canoas': [
                 { id: 1, nome: 'Havan Canoas Centro', endereco: 'Av. Guilherme Schell, 5000' },
                 { id: 2, nome: 'Havan Canoas Shopping', endereco: 'Av. dos Estados, 450' }
@@ -427,13 +437,79 @@
         let filtroPrecoAtivo = 'todos';
         let categoriaAtiva = 'todos';
         
-        let pedidoAtivo = { id: "", status: "criacao", produto: null, loja: null };
+        let pedidoAtivo = { id: "", backendId: null, status: "criacao", produto: null, loja: null, codigoRetirada: "" };
 
-        window.onload = () => {
+        window.onload = async () => {
+            await carregarDadosBackend();
             executarFiltrosCombinados();
             renderizarLojasModal();
             atualizarLayoutFocoLoja();
         };
+
+        async function apiFetch(path, options = {}) {
+            const resp = await fetch(`${API_BASE_URL}${path}`, {
+                headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+                ...options
+            });
+            const data = await resp.json();
+            if (!resp.ok) {
+                throw new Error(data.error || 'Falha ao comunicar com a API.');
+            }
+            return data;
+        }
+
+        function slugCidade(nome) {
+            return nome.toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, '-');
+        }
+
+        async function carregarDadosBackend() {
+            try {
+                await apiFetch('/api/health');
+
+                const produtosResp = await apiFetch('/api/products');
+                const produtosComEstoque = await Promise.all(produtosResp.products.map(async (p) => {
+                    const lojasResp = await apiFetch(`/api/stores?product_id=${p.id}`);
+                    const estoques = {};
+                    lojasResp.stores.forEach((loja) => {
+                        estoques[loja.id] = loja.stock || 0;
+                    });
+
+                    return {
+                        id: p.id,
+                        nome: p.name,
+                        categoria: p.category,
+                        preco: p.price,
+                        img: imagensProdutos[p.id],
+                        estoques
+                    };
+                }));
+
+                const lojasResp = await apiFetch('/api/stores');
+                const lojasAgrupadas = {};
+                lojasResp.stores.forEach((loja) => {
+                    const chave = slugCidade(loja.city);
+                    if (!lojasAgrupadas[chave]) lojasAgrupadas[chave] = [];
+                    lojasAgrupadas[chave].push({
+                        id: loja.id,
+                        nome: loja.name,
+                        endereco: loja.address,
+                        cidade: loja.city
+                    });
+                });
+
+                dbProdutos = produtosComEstoque;
+                dbLojas = lojasAgrupadas;
+                lojaAtiva = dbLojas['canoas']?.[0] || Object.values(dbLojas)[0]?.[0] || lojaAtiva;
+                lojaTemp = lojaAtiva;
+                triggerToast("Backend conectado", "Produtos, lojas e estoques carregados da API Python.", "success");
+            } catch (err) {
+                console.warn(err);
+                triggerToast("Modo offline", "API indisponivel. Usando dados locais do prototipo.", "warning");
+            }
+        }
 
         // Renderizador Robusto da Vitrine de Produtos (Havan Grid)
         function renderizarVitrine(lista) {
@@ -599,7 +675,13 @@
             const box = document.getElementById('box-lista-lojas');
             box.innerHTML = '';
 
-            dbLojas[cid].forEach(l => {
+            const lojasCidade = dbLojas[cid] || [];
+            if (lojasCidade.length === 0) {
+                box.innerHTML = `<div class="border border-amber-200 bg-amber-50 p-3 rounded-xl text-xs text-amber-700 font-semibold">Nenhuma loja disponivel para esta cidade.</div>`;
+                return;
+            }
+
+            lojasCidade.forEach(l => {
                 const isChecked = l.id === lojaTemp.id;
                 const div = document.createElement('div');
                 div.className = `border p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all ${isChecked ? 'border-blue-600 bg-blue-50/50' : 'border-gray-200 hover:bg-gray-50'}`;
@@ -662,16 +744,44 @@
         }
 
         // Execução do Checkout Comercial
-        function processarCheckoutO2O() {
+        async function processarCheckoutO2O() {
             if (modalidadeEnvio === 'entrega') {
                 triggerToast("Restrição Acadêmica", "Escolha a modalidade de Retirada Balcão (Click & Collect) para testar o sistema.", "warning");
                 return;
             }
 
-            pedidoAtivo.id = `#HV-26${Math.floor(1000 + Math.random() * 9000)}`;
-            pedidoAtivo.status = "aguardando";
-            pedidoAtivo.produto = produtoSelecionado;
-            pedidoAtivo.loja = lojaAtiva;
+            if (!produtoSelecionado) {
+                triggerToast("Produto obrigatorio", "Selecione um produto antes de finalizar o pedido.", "warning");
+                return;
+            }
+
+            try {
+                const resp = await apiFetch('/api/orders', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        customer_name: "Cliente MegaLoja",
+                        delivery_method: "retirar_na_loja",
+                        store_id: lojaAtiva.id,
+                        product_id: produtoSelecionado.id,
+                        quantity: 1
+                    })
+                });
+
+                const pedidoApi = resp.order;
+                pedidoAtivo.id = `#ML-${String(pedidoApi.id).padStart(4, '0')}`;
+                pedidoAtivo.backendId = pedidoApi.id;
+                pedidoAtivo.status = "aguardando";
+                pedidoAtivo.produto = produtoSelecionado;
+                pedidoAtivo.loja = lojaAtiva;
+                pedidoAtivo.codigoRetirada = pedidoApi.pickup_code;
+
+                if (produtoSelecionado.estoques[lojaAtiva.id] > 0) {
+                    produtoSelecionado.estoques[lojaAtiva.id] -= 1;
+                }
+            } catch (err) {
+                triggerToast("Erro no backend", err.message, "warning");
+                return;
+            }
 
             document.getElementById('txt-sucesso-id').innerText = `ID DA COMPRA: ${pedidoAtivo.id}`;
             document.getElementById('txt-operador-id').innerText = pedidoAtivo.id;
@@ -705,7 +815,7 @@
                 badge.className = "bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5";
                 wrap.classList.remove('opacity-50');
                 overlay.classList.add('hidden');
-                token.innerText = "HV-O2O-2026";
+                token.innerText = pedidoAtivo.codigoRetirada || "HV-O2O-2026";
                 token.className = "text-xs font-mono bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200 text-emerald-700 font-bold tracking-widest shadow-sm";
             } else {
                 badge.className = "bg-rose-50 text-rose-800 text-xs font-bold px-3 py-1 rounded-full border border-rose-200 flex items-center gap-1.5";
@@ -717,13 +827,33 @@
         }
 
         // Operador Backoffice
-        function mudarStatusOperador(statusAlvo) {
+        async function mudarStatusOperador(statusAlvo) {
             if (pedidoAtivo.status === 'criacao') {
                 triggerToast("Erro de Operação", "Não há pedidos ativos na esteira.", "warning");
                 return;
             }
 
             const badgeOp = document.getElementById('badge-operador-status');
+            const statusApi = {
+                pronto: "pronto_retirada",
+                entregue: "retirado",
+                cancelado: "cancelado"
+            };
+
+            if (pedidoAtivo.backendId) {
+                try {
+                    await apiFetch(`/api/orders/${pedidoAtivo.backendId}/status`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                            status: statusApi[statusAlvo],
+                            pickup_code: pedidoAtivo.codigoRetirada
+                        })
+                    });
+                } catch (err) {
+                    triggerToast("Erro no backend", err.message, "warning");
+                    return;
+                }
+            }
 
             if (statusAlvo === 'pronto') {
                 pedidoAtivo.status = "pronto";
