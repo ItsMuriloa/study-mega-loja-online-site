@@ -400,7 +400,8 @@
     </footer>
 
     <script>
-        const API_BASE_URL = 'http://127.0.0.1:5000';
+        const isLocalFrontend = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+        const API_BASE_URL = isLocalFrontend ? 'http://127.0.0.1:5000' : '';
         const imagensProdutos = {
             201: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=500&q=80',
             202: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80',

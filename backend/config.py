@@ -1,8 +1,9 @@
+import os
 from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = BASE_DIR / "megaloja.db"
+DB_PATH = Path("/tmp/megaloja.db") if os.environ.get("VERCEL") else BASE_DIR / "megaloja.db"
 
 # Estados permitidos no ciclo de vida de um pedido Click & Collect.
 ORDER_STATUS = {
