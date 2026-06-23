@@ -34,11 +34,13 @@ class ApiHandler(BaseHTTPRequestHandler):
     server_version = "MegaLojaAPI/1.0"
 
     def do_OPTIONS(self):
+        # Atende a verificacao CORS feita pelo navegador antes de alguns requests.
         self.send_response(204)
         self.send_cors_headers()
         self.end_headers()
 
     def do_GET(self):
+        # Centraliza as consultas da API: saude, lojas, produtos, pedidos e notificacoes.
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/") or "/"
         query = parse_qs(parsed.query)
@@ -77,6 +79,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             self.respond_error(500, f"Erro no banco de dados: {exc}")
 
     def do_POST(self):
+        # No MVP, o POST principal cria um pedido a partir do checkout.
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/") or "/"
 
@@ -93,6 +96,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             self.respond_error(500, f"Erro no banco de dados: {exc}")
 
     def do_PATCH(self):
+        # Atualiza o status do pedido, simulando a acao do funcionario da loja.
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/") or "/"
 
@@ -130,6 +134,7 @@ class ApiHandler(BaseHTTPRequestHandler):
         )
 
     def extract_id(self, path, prefix, suffix=""):
+        # Extrai o ID numerico de URLs como /api/orders/1/status.
         value = path.removeprefix(prefix)
         if suffix:
             value = value.removesuffix(suffix)
@@ -138,6 +143,7 @@ class ApiHandler(BaseHTTPRequestHandler):
         return int(value)
 
     def read_json(self):
+        # Converte o corpo da requisicao HTTP em dicionario Python.
         length = int(self.headers.get("Content-Length", 0))
         if length == 0:
             return {}
@@ -148,6 +154,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             raise ValueError("JSON invalido.") from exc
 
     def respond_json(self, data, status=200):
+        # Padroniza todas as respostas da API em JSON com suporte a CORS.
         body = json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8")
         self.send_response(status)
         self.send_cors_headers()
@@ -160,6 +167,7 @@ class ApiHandler(BaseHTTPRequestHandler):
         self.respond_json({"error": message}, status=status)
 
     def send_cors_headers(self):
+        # Permite que o frontend em HTML acesse a API mesmo estando em outra porta.
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")

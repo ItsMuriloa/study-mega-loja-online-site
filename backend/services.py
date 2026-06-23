@@ -10,6 +10,7 @@ except ImportError:
 
 
 class ApiError(Exception):
+    # Erro de negocio com codigo HTTP. Exemplo: 400 para dado invalido.
     def __init__(self, status, message):
         super().__init__(message)
         self.status = status
@@ -21,6 +22,7 @@ def now_iso():
 
 
 def generate_pickup_code():
+    # Codigo entregue ao cliente para confirmar a retirada no balcao.
     return f"HV-{secrets.randbelow(9000) + 1000}-{secrets.randbelow(9000) + 1000}"
 
 
@@ -32,6 +34,7 @@ def create_notification(conn, order_id, message):
 
 
 def get_order(conn, order_id):
+    # Une pedido, produto e loja para devolver uma visao completa ao frontend.
     return conn.execute(
         """
         SELECT
@@ -60,6 +63,7 @@ def get_order(conn, order_id):
 
 
 def list_stores(city=None, product_id=None):
+    # Lista lojas ativas. Com product_id, inclui tambem o estoque em cada loja.
     sql = """
         SELECT s.id, s.name, s.city, s.zip_code, s.address, s.capacity, s.active
         FROM stores s
@@ -91,6 +95,7 @@ def list_stores(city=None, product_id=None):
 
 
 def list_products(store_id=None):
+    # Lista produtos. Com store_id, mostra o estoque local daquela unidade.
     if store_id:
         sql = """
             SELECT p.id, p.name, p.category, p.price, COALESCE(i.quantity, 0) AS stock
@@ -148,6 +153,8 @@ def list_notifications(order_id):
 
 
 def create_order(payload):
+    # Regras principais do checkout: validar dados, conferir estoque,
+    # criar pedido, baixar estoque e registrar a primeira notificacao.
     customer_name = str(payload.get("customer_name", "Cliente MegaLoja")).strip()
     delivery_method = payload.get("delivery_method")
     store_id = payload.get("store_id")
@@ -171,6 +178,7 @@ def create_order(payload):
             raise ApiError(404, "Produto nao encontrado.")
 
         if delivery_method == "retirar_na_loja":
+            # Click & Collect exige loja ativa e estoque suficiente antes de criar o pedido.
             store = conn.execute("SELECT id FROM stores WHERE id = ? AND active = 1", (store_id,)).fetchone()
             if not store:
                 raise ApiError(404, "Loja nao encontrada.")
@@ -208,6 +216,7 @@ def create_order(payload):
         order_id = cursor.lastrowid
 
         if delivery_method == "retirar_na_loja":
+            # A baixa de estoque acontece no momento em que o pedido e confirmado.
             conn.execute(
                 """
                 UPDATE inventory
@@ -228,6 +237,8 @@ def create_order(payload):
 
 
 def update_order_status(order_id, payload):
+    # Simula o fluxo operacional da loja: preparar, liberar retirada,
+    # confirmar retirada ou cancelar o pedido.
     new_status = payload.get("status")
     pickup_code = payload.get("pickup_code")
 
@@ -244,6 +255,7 @@ def update_order_status(order_id, payload):
             raise ApiError(409, "Pedido ja esta encerrado.")
 
         if new_status == "retirado" and order["delivery_method"] == "retirar_na_loja":
+            # A retirada so e concluida se o codigo informado bater com o codigo do pedido.
             if pickup_code != order["pickup_code"]:
                 raise ApiError(403, "Codigo de retirada invalido.")
 

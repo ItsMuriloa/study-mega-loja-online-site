@@ -8,6 +8,7 @@ except ImportError:
 
 def connect_db():
     conn = sqlite3.connect(DB_PATH)
+    # row_factory permite acessar colunas pelo nome, por exemplo row["name"].
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
@@ -19,6 +20,8 @@ def row_to_dict(row):
 
 def init_db():
     with connect_db() as conn:
+        # O schema representa o fluxo principal: lojas, produtos, estoque,
+        # pedidos e notificacoes geradas durante a retirada.
         conn.executescript(
             """
             CREATE TABLE IF NOT EXISTS stores (
@@ -81,6 +84,7 @@ def seed_stores(conn):
     if store_count > 0:
         return
 
+    # Dados iniciais para demonstrar a escolha de loja fisica.
     conn.executemany(
         """
         INSERT INTO stores (id, name, city, zip_code, address, capacity)
@@ -99,6 +103,7 @@ def seed_products(conn):
     if product_count > 0:
         return
 
+    # Catalogo minimo usado pelo frontend do MVP.
     conn.executemany(
         "INSERT INTO products (id, name, category, price) VALUES (?, ?, ?, ?)",
         [
@@ -117,6 +122,7 @@ def seed_inventory(conn):
     if inventory_count > 0:
         return
 
+    # Cada tupla liga loja, produto e quantidade disponivel naquela unidade.
     inventory = [
         (1, 201, 5), (2, 201, 0), (3, 201, 4),
         (1, 202, 12), (2, 202, 8), (3, 202, 0),

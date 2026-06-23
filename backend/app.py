@@ -9,6 +9,8 @@ except ImportError:
 
 
 def run(host="127.0.0.1", port=5000):
+    # Inicializa o SQLite antes de expor a API. Se o banco nao existir,
+    # as tabelas e dados iniciais sao criados automaticamente.
     init_db()
     server = ThreadingHTTPServer((host, port), ApiHandler)
     print(f"MegaLoja API rodando em http://{host}:{port}")
